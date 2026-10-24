@@ -1,5 +1,8 @@
 # Инструкция по запуску проекта
 
+## В ПАПКЕ back НУЖНО СОЗДАТЬ .env ФАЙЛ С СОДЕРЖИМЫМ:
+DATABASE_URL=postgresql://myuser:mypassword@db:5432/mydb
+
 ## Запуск приложения из корня приложения
 ```bash
 docker compose up -d --build
