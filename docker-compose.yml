@@ -1,0 +1,45 @@
+services:
+  # Фронтенд (React на Nginx)
+  front:
+    build:
+      context: ./front
+    ports:
+      - "8080:80" # Открываем на порту 8080 для Cloud Shell
+    depends_on:
+      - web
+
+  # Бэкенд (Express)
+  web:
+    build:
+      context: ./back
+    ports:
+      - "3000:3000"
+    environment:
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_DB=mydb
+    depends_on:
+      db:
+        condition: service_healthy
+
+  # База данных (PostgreSQL)
+  db:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=myuser
+      - POSTGRES_PASSWORD=mypassword
+      - POSTGRES_DB=mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./back/init.sql:/docker-entrypoint-initdb.d/init.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydb"]
+      interval: 3s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  pgdata:
